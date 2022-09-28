@@ -1,0 +1,179 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-09-28T14:45:07Z'
+  groups:
+    -
+      uuid: d8e9b38ec5f84be396505d4ee15d4901
+      name: 'HUA - Computadores'
+    -
+      uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+  templates:
+    -
+      uuid: de0b998dcfe943838fa589362769eeb6
+      template: 'Windows by DanDan'
+      name: 'Windows by DanDan'
+      groups:
+        -
+          name: 'HUA - Computadores'
+        -
+          name: Templates
+      items:
+        -
+          uuid: caf891a0d9e34d05a9691e1cae7c046d
+          name: 'Endereço IP'
+          key: net.if.list
+          delay: 30m
+          trends: '0'
+          value_type: CHAR
+          inventory_link: HOST_NETWORKS
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const teste = value.search("10.118.2");
+                  const resultado = value.substr(teste, 12);
+                  return resultado;
+          tags:
+            -
+              tag: Application
+              value: DanDan
+        -
+          uuid: 16d597b2bfc44192a0184afbb43b51f3
+          name: 'Endereço Mac B'
+          key: 'wmi.getall[root\cimv2,"select MACAddress  from Win32_NetworkAdapterConfiguration Where IPEnabled = True"]'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MACADDRESS_B
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const teste = value.split(",");
+                  var mac = teste[0].replace(/"/g, "").replace(/\]/g, "").replace(/}/g, "");
+                  return mac.replace("{MACAddress:", "").replace("MACAddress:","").replace("[","");
+          tags:
+            -
+              tag: Application
+              value: DanDan
+        -
+          uuid: edbbdba2dcfa491a990e585925c641ca
+          name: 'Endereço Mac A'
+          key: 'wmi.getall[root\cimv2,"select MACAddress from Win32_NetworkAdapterConfiguration Where IPEnabled = True"]'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MACADDRESS_A
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const teste = value.split(",");
+                  var mac = teste[1].replace(/"/g, "").replace(/\]/g, "").replace(/}/g, "");
+                  return mac.replace("{MACAddress:", "").replace("MACAddress:","");
+          tags:
+            -
+              tag: Application
+              value: DanDan
+        -
+          uuid: 1eabd80f13b54c5a985e6cce339d7afc
+          name: Fornecedor
+          key: 'wmi.getall[root\cimv2,"select Manufacturer from Win32_ComputerSystem"]'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: VENDOR
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const teste = value.split(":");
+                  const fornecedor = teste[1].replace(/"/g, "").replace(/\]/g, "").replace(/}/g, "").split(',')
+                  return fornecedor [0];
+          tags:
+            -
+              tag: Application
+              value: DanDan
+        -
+          uuid: d3e81a5780af45b9bb5e1e96cee58a92
+          name: 'Modelo do Dispositivo'
+          key: 'wmi.getall[root\cimv2,"select Model from Win32_ComputerSystem"]'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const teste = value.split(":");
+                  const modelo = teste[1].replace(/"/g, "").replace(/\]/g, "").replace(/}/g, "").split(',');
+                  return modelo[0];
+          tags:
+            -
+              tag: Application
+              value: DanDan
+        -
+          uuid: c1ff31e169af471a9389efa25cb3124d
+          name: 'Hardware CPU'
+          key: 'wmi.getall[root\cimv2,"select name from win32_processor"]'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: HARDWARE
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const teste = value.split(":");
+                  return teste[1].replace(/"/g, "").replace(/\]/g, "").replace(/}/g, "");
+          tags:
+            -
+              tag: Application
+              value: DanDan
+        -
+          uuid: e0738a0f40cb49bd9e0e43b1b527e8e4
+          name: 'Número Serial A'
+          key: 'wmi.getall[root\cimv2,"select SerialNumber from Win32_Bios "]'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const teste = value.split(":");
+                  var serial = teste[1].replace(/"/g, "").replace(/\]/g, "").replace(/}/g, "").split(",");
+                  return serial[0];
+          tags:
+            -
+              tag: Application
+              value: DanDan
+        -
+          uuid: e9365af3af4d4b10a0cd021b95d236ce
+          name: 'Hardware Detalhado'
+          key: 'wmi.getall[root\cimv2,"select TotalPhysicalMemory from Win32_ComputerSystem"]'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: HARDWARE_FULL
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const teste = value.split(":");
+                  var memoria= teste[1].replace(/"/g, "").replace(/\]/g, "").replace(/}/g, "").split(',');
+                  memoria =  Math.round(memoria[0]  / (1024*1024*1024));
+                  var resultado = "Memória Ram: "+ memoria + " GB";
+                  return resultado ;
+          tags:
+            -
+              tag: Application
+              value: DanDan
+      tags:
+        -
+          tag: Application
+          value: DanDan
